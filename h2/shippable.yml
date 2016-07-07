@@ -1,0 +1,8 @@
+language: java
+java:
+  - 1.7
+
+build:
+  ci:
+    - sh build.sh clean
+    - sh build.sh test
