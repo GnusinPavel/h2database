@@ -4,5 +4,6 @@ java:
 
 build:
   ci:
-    - sh h2/build.sh clean
-    - sh h2/build.sh test
+    - cd h2
+    - sh build.sh clean
+    - sh build.sh test
