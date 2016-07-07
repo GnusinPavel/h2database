@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/GnusinPavel/h2database.png?label=ready&title=Ready)](https://waffle.io/GnusinPavel/h2database)
 # Welcome to H2, the Java SQL database.
 
 ## The main features of H2 are:
