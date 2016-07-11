@@ -1,0 +1,9 @@
+language: java
+java:
+  - 1.7
+
+build:
+  ci:
+    - cd h2
+    - sh build.sh clean
+    - sh build.sh test
