@@ -1,4 +1,4 @@
-package org.h2.detectionService;
+package org.h2.detectionservice;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
