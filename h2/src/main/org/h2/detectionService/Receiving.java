@@ -4,41 +4,69 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketTimeoutException;
 
 /**
- * Created by Pavel Kulkov  on 11.07.2016.
+ * Created by Dmitry Konyakhin  on 11.07.2016.
  */
-public class Receiving extends Thread{
-        private final int PORT = 4445;
-        //private String IP = new String("224.0.0.0");
-        private DatagramSocket socket;
-        private InetAddress group;
+public class Receiving {
+    private int PORT;
+    private String myIP;
+    private DatagramSocket socket;
+    private int timeout;
+    private boolean cluster;
 
 
-        public Receiving() throws IOException {
+    public Receiving() throws IOException {
+        this.PORT = 4445;
+        myIP = InetAddress.getLocalHost().getHostAddress();
+        cluster = false;
+        timeout = 200;
+    }
+
+    public Receiving(int PORT) throws IOException {
+        this.PORT = PORT;
+        myIP = InetAddress.getLocalHost().getHostAddress();
+        cluster = false;
+        timeout = 200;
+    }
+
+    public Receiving(int PORT, int timeout) throws IOException {
+        this.PORT = PORT;
+        this.timeout = timeout;
+        myIP = InetAddress.getLocalHost().getHostAddress();
+        cluster = false;
+    }
+
+
+    public void run() {
+        try {
             socket = new DatagramSocket(PORT);
-            //group = InetAddress.getByName(IP);
-        }
-
-
-        public void run() {
-            try {
-                //socket.joinGroup(group);
-                DatagramPacket packet;
-                while (true) {
-                    byte[] buf = new byte[256];
-                    packet = new DatagramPacket(buf, buf.length);
-                    socket.receive(packet);
-                    String received = new String(packet.getData(),packet.getOffset(),packet.getLength());
-                    if(received.length()!=0 && received.substring(0,3).equals("h2o")){
-                    //    Main.nodes.add(received.substring(3));
-                        break;
-                    }
+            DatagramPacket packet;
+            byte[] buf = new byte[256];
+            packet = new DatagramPacket(buf, buf.length);
+            socket.setSoTimeout(timeout);
+            socket.receive(packet);
+            String received = new String(packet.getData(), packet.getOffset(), packet.getLength());
+            System.out.println(received);
+            if (received.length() != 0) {
+                received = received.substring(4, received.length() - 1);
+                if (!Main.nodes.contains(received) && received != myIP) {
+                    cluster = true;
+                    Main.nodes.add(received);
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                socket.close();
             }
+
+        } catch (SocketTimeoutException ste) {
+            System.out.println(ste.getMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            socket.close();
         }
     }
+
+    public boolean isCluster() {
+        return cluster;
+    }
+}
